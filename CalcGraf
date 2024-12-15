@@ -1,0 +1,126 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Calculator extends JFrame {
+    private JTextField display;
+
+    public Calculator() {
+        // Настройки окна
+        setTitle("Калькулятор");
+        setSize(300, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        // Создание текстового поля для отображения
+        display = new JTextField();
+        display.setEditable(false);
+        display.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        // Создание кнопок
+        JButton[] numberButtons = new JButton[10];
+        for (int i = 0; i < 10; i++) {
+            numberButtons[i] = new JButton(String.valueOf(i));
+            numberButtons[i].addActionListener(new NumberButtonListener());
+        }
+
+        JButton addButton = new JButton("+");
+        JButton subtractButton = new JButton("-");
+        JButton multiplyButton = new JButton("*");
+        JButton divideButton = new JButton("/");
+        JButton equalsButton = new JButton("=");
+        JButton clearButton = new JButton("C");
+
+        // Добавление слушателей к кнопкам
+        addButton.addActionListener(new OperatorButtonListener());
+        subtractButton.addActionListener(new OperatorButtonListener());
+        multiplyButton.addActionListener(new OperatorButtonListener());
+        divideButton.addActionListener(new OperatorButtonListener());
+        equalsButton.addActionListener(new EqualsButtonListener());
+        clearButton.addActionListener(e -> display.setText(""));
+
+        // Создание панели для кнопок
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(4, 4, 10, 10));
+        
+        // Добавление кнопок на панель
+        panel.add(numberButtons[1]);
+        panel.add(numberButtons[2]);
+        panel.add(numberButtons[3]);
+        panel.add(addButton);
+        panel.add(numberButtons[4]);
+        panel.add(numberButtons[5]);
+        panel.add(numberButtons[6]);
+        panel.add(subtractButton);
+        panel.add(numberButtons[7]);
+        panel.add(numberButtons[8]);
+        panel.add(numberButtons[9]);
+        panel.add(multiplyButton);
+        panel.add(clearButton);
+        panel.add(numberButtons[0]);
+        panel.add(equalsButton);
+        panel.add(divideButton);
+
+        // Добавление компонентов в окно
+        add(display, BorderLayout.NORTH);
+        add(panel, BorderLayout.CENTER);
+    }
+
+    private class NumberButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton button = (JButton) e.getSource();
+            display.setText(display.getText() + button.getText());
+        }
+    }
+
+    private class OperatorButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JButton button = (JButton) e.getSource();
+            display.setText(display.getText() + " " + button.getText() + " ");
+        }
+    }
+
+    private class EqualsButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String[] tokens = display.getText().split(" ");
+            if (tokens.length < 3) return;
+
+            double num1 = Double.parseDouble(tokens[0]);
+            String operator = tokens[1];
+            double num2 = Double.parseDouble(tokens[2]);
+            double result = 0;
+
+            switch (operator) {
+                case "+":
+                    result = num1 + num2;
+                    break;
+                case "-":
+                    result = num1 - num2;
+                    break;
+                case "*":
+                    result = num1 * num2;
+                    break;
+                case "/":
+                    if (num2 != 0) {
+                        result = num1 / num2;
+                    } else {
+                        display.setText("Ошибка: деление на ноль");
+                        return;
+                    }
+                    break;
+            }
+            display.setText(String.valueOf(result));
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Calculator calculator = new Calculator();
+            calculator.setVisible(true);
+        });
+    }
+}
